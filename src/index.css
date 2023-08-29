@@ -4,5 +4,6 @@
   box-sizing: border-box;
 }
 .canvas {
+  margin-top: 2vh;
   height: 90vh;
 }

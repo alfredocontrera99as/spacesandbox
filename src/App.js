@@ -2,105 +2,167 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import './App.css';
 import Nav from 'react-bootstrap/Nav';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { FabricJSCanvas, useFabricJSEditor } from 'fabricjs-react-improve'
-import {BiUpArrowAlt, BiDownArrowAlt} from 'react-icons/bi'
-import {PiTextAaBold} from 'react-icons/pi'
+import OpenButton from './components/OpenButton/OpenButton';
+import { AiOutlineTool, AiFillProfile } from 'react-icons/ai'
+import PlayButton from './components/PlayButton/PlayButton';
+import Menu from './components/Menu/Menu';
+import useDeleteSelectedOnKeyPress from './hooks/useDeleteSelectedOnKeyPress';
+import { BsCircle, BsFillCircleFill, BsTriangle, BsSquare, BsZoomIn, BsZoomOut, BsTrashFill } from 'react-icons/bs';
+import { TbAbc } from "react-icons/tb";
+import MenuButton from './components/MenuButtton/MenuButton';
+// import { useMobileOrientation } from 'react-device-detect';
 function App() {
+  // const { isLandscape } = useMobileOrientation()
+
   const { editor, onReady, selectedObjects } = useFabricJSEditor()
-  const [color, setColor] = useState("#ffffff");
-  const changeColor = (e) => {
-    setColor(e.target.value)
-    editor?.setFillColor(color)
-  }
+  const [play, setPlay] = useState(false);
+  // const [color, setColor] = useState("#ffffff");
+  const [toolbarOpen, setToolbarOpen] = useState(false);
+  const [propertiesOpen, setPropertiesOpen] = useState(false);
+  const openToolbar = () => { setToolbarOpen((toolbarOpen) => !toolbarOpen) }
+  const openProperties = () => { setPropertiesOpen((propertiesOpen) => !propertiesOpen) }
+  const [selectTool, setSelectedTool] = useState("CIRCLE_WHITE")
+  // this effect adds a shorcut for delete key
+  useDeleteSelectedOnKeyPress(editor)
+  // const changeColor = (e) => {
+  //   setColor(e.target.value)
+  //   editor?.setFillColor(color)
+  // }
+
   const onAddCircle = () => {
     editor?.addCircle()
   }
   const onAddRectangle = () => {
     editor?.addRectangle();
-    
   }
   const onAddTriangle = () => {
     editor.addTriangle();
   }
-  const deleteSelected = () => {
-    editor?.deleteSelected();
-  }
+  // const deleteSelected = () => {
+  // editor?.deleteSelected();
+  // }
   const onAddText = () => {
     if (selectedObjects?.length) {
-      return editor?.updateText("Edita el Texto")
+      return editor?.updateText("Edita el Texto", { fontSize: "48" })
     }
-    editor?.addText("Edita el Texto")
+    editor?.addText("Edita el Texto", {})
   }
-  const bringForward = () => {
-    editor?.moveForward();
-  }
-  const bringBack = () => {
-    editor?.sendBack();
-  }
-  useEffect(() => {
-    const deleteElements = () => {
-      editor.deleteSelected();
-    };
+  // const bringForward = () => {
+  //   editor?.moveForward();
+  // }
+  // const bringBack = () => {
+  //   editor?.sendBack();
+  // }
+  const changeSelectedTool = (text) => {
+    if (selectTool !== text) {
+      setSelectedTool(text)
+    } else {
+      setSelectedTool("")
 
-    const handleKeyPress = (event) => {
-      if (event.key === 'Delete') {
-        deleteElements();
+    }
+  }
+  const doFunction = (e) => {
+    if (selectedObjects.length === 0) {
+
+      switch (selectTool) {
+        case "CIRCLE":
+          editor?.setFillColor("rgb(255, 0, 0,1)")
+          editor?.addCircle({left: e.clientX - 80 , top: e.clientY - 160, width: 80, height:80, radius:80, angle:0});
+          break;
+        case "CIRCLE_WHITE":
+          editor?.setFillColor("rgb(255,255,255,1)")
+          editor?.addCircle({left: e.clientX - 40 , top: e.clientY - 90, width: 80, height:80, radius:80, angle:0});
+          break;
+        case "RECT":
+          editor?.setFillColor("rgb(255,0,0,1)")
+          editor?.addRectangle({left: e.clientX - 40 , top: e.clientY - 90, width: 80, height:80, angle:0});
+          break;
+        case "TRIANGLE":
+          onAddTriangle();
+          break;
+        case "TEXT":
+          onAddText();
+          break;
+        case "ZOOM_IN":
+          break;
+        case "DELETE":
+          editor?.deleteSelected();
+        default:
+          break;
       }
-    };
-
-    document.addEventListener('keydown', handleKeyPress);
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyPress);
-    };
-  });
+    }
+  }
   return (
     <div className="App" >
       <Nav
-        className='bg-black p-2'
+        className='bg-black d-flex justify-content-between'
         activeKey="/home"
         onSelect={(selectedKey) => alert(`selected ${selectedKey}`)}
       >
-        <Nav.Item className=' bg-white rounded m-1'>
-          <Nav.Link onClick={onAddCircle}>Circle</Nav.Link>
-        </Nav.Item>
-        <Nav.Item className=' bg-white rounded m-1'>
-          <Nav.Link onClick={onAddRectangle}>Rect</Nav.Link>
-        </Nav.Item>
-        <Nav.Item className=' bg-white rounded m-1'>
-          <Nav.Link onClick={onAddTriangle}>Triangle</Nav.Link>
-        </Nav.Item>
-        <Nav.Item onClick={deleteSelected}>
-          <Nav.Link >
-            Delete
-          </Nav.Link>
-        </Nav.Item>
-        <Nav.Item className='bg-white rounded p-2 d-flex flex-row justify-content-center align-items-center' >
-          <h5 className='m-1'>
-            Color
-          </h5>
-          <input type="color" value={color} onInput={changeColor}/>
-        </Nav.Item>
-        <Nav.Item onClick={onAddText}>
-          <Nav.Link >
-            <PiTextAaBold size={30} color="#fff"/>
-          </Nav.Link>
-        </Nav.Item>
-        <Nav.Item onClick={bringForward}>
-          <Nav.Link >
-            <BiUpArrowAlt size={30} color="#fff"/>
-          </Nav.Link>
-        </Nav.Item>
-        <Nav.Item onClick={bringBack}>
-          <Nav.Link >
-            <BiDownArrowAlt size={30} color="#fff"/>
-          </Nav.Link>
-        </Nav.Item>
+
+        <OpenButton Icon={AiOutlineTool} condition={toolbarOpen} changeFunction={openToolbar} altDescription="Abrir Barra de Herramientas" title="Cerrar Barra de Herramientas" />
+        <div className='w-75 d-flex justify-content-start  align-items-center '>
+          <button className='bg-transparent text-white border-0 h5 me-3 my-1  ]' title="Crear nueva composicion">Nueva</button>
+          <button className='bg-transparent text-white border-0 h5 me-3 my-1  ]' title="Abrir una composicion">Abrir</button>
+          <PlayButton changeFunction={setPlay} condition={play} title="Pausar Composicion" altDescription="Reproducir Composicion" />
+        </div>
+        <OpenButton Icon={AiFillProfile} condition={propertiesOpen} changeFunction={openProperties} title="Abrir menú de propiedades" altDescription="Cerrar menú de propiedades" />
       </Nav>
+      <div onClick={doFunction}>
+        <FabricJSCanvas  className='canvas' onReady={onReady} />
+      </div>
+      {
+        toolbarOpen ?
+          <Menu show={toolbarOpen} toggleShow={openToolbar} title="Barra de Herramientas" >
+            <div className='d-flex flex-column justify-content-start align-items-baseline w-100  h-100'>
+              <div className='text-dark h-25 w-100 p-2 d-flex flex-column'>
+                <h5>Formas</h5>
+                <div className='h-100 w-100 p-2 d-flex flex-row  gap-3 '>
+                  <MenuButton onClick={() => changeSelectedTool("CIRCLE_WHITE")} selected={selectTool === "CIRCLE_WHITE"}>
+                    <BsCircle size={40} />
+                  </MenuButton>
+                  <MenuButton onClick={() => changeSelectedTool("CIRCLE")} selected={selectTool === "CIRCLE"}>
+                    <BsFillCircleFill size={40} />
+                  </MenuButton>
+                  <MenuButton onClick={() => changeSelectedTool("TRIANGLE")} selected={selectTool === "TRIANGLE"}>
+                    <BsTriangle size={40} />
+                  </MenuButton>
+                  <MenuButton onClick={() => changeSelectedTool("RECT")} selected={selectTool === "RECT"}>
+                    <BsSquare size={40} />
+                  </MenuButton>
+                </div>
+              </div>
+              <div className='text-dark h-25 w-100 p-2 d-flex flex-column'>
+                <h5>Otras</h5>
+                <div className='h-100 w-100 p-2 d-flex flex-row  gap-3 '>
+                  <MenuButton onClick={() => changeSelectedTool("TEXT")} selected={selectTool === "TEXT"}>
+                    <TbAbc size={40} />
+                  </MenuButton>
+                  <MenuButton onClick={() => editor?.zoomIn()}>
+                    <BsZoomIn size={40} />
+                  </MenuButton>
+                  <MenuButton onClick={() => editor?.zoomOut()} >
+                    <BsZoomOut size={40} />
+                  </MenuButton>
+                  <MenuButton onClick={() => editor?.deleteSelected()}>
+                    <BsTrashFill size={40} />
+                  </MenuButton>
 
+                </div>
+              </div>
+            </div>
+          </Menu>
+          : null
+      }
+      {
+        propertiesOpen ?
+          <Menu show={propertiesOpen} placement="end" toggleShow={openProperties} title="Propiedades" />
+          :
+          null
+      }
 
-      <FabricJSCanvas className='canvas' onReady={onReady} />
     </div>
   );
 }
