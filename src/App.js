@@ -12,6 +12,8 @@ import useDeleteSelectedOnKeyPress from './hooks/useDeleteSelectedOnKeyPress';
 import { BsCircle, BsFillCircleFill, BsTriangle, BsSquare, BsZoomIn, BsZoomOut, BsTrashFill } from 'react-icons/bs';
 import { TbAbc } from "react-icons/tb";
 import MenuButton from './components/MenuButtton/MenuButton';
+import ColorTable from './components/ColorTable/ColorTable';
+import ZIndexInput from './components/ZIndexInput/ZIndexInput';
 // import { useMobileOrientation } from 'react-device-detect';
 function App() {
   // const { isLandscape } = useMobileOrientation()
@@ -26,35 +28,17 @@ function App() {
   const [selectTool, setSelectedTool] = useState("CIRCLE_WHITE")
   // this effect adds a shorcut for delete key
   useDeleteSelectedOnKeyPress(editor)
-  // const changeColor = (e) => {
-  //   setColor(e.target.value)
-  //   editor?.setFillColor(color)
-  // }
+  const changeColor = (color) => {
+    editor?.setFillColor(color)
+  }
 
-  const onAddCircle = () => {
-    editor?.addCircle()
-  }
-  const onAddRectangle = () => {
-    editor?.addRectangle();
-  }
-  const onAddTriangle = () => {
-    editor.addTriangle();
-  }
-  // const deleteSelected = () => {
-  // editor?.deleteSelected();
-  // }
-  const onAddText = () => {
-    if (selectedObjects?.length) {
-      return editor?.updateText("Edita el Texto", { fontSize: "48" })
-    }
-    editor?.addText("Edita el Texto", {})
-  }
   // const bringForward = () => {
   //   editor?.moveForward();
   // }
   // const bringBack = () => {
   //   editor?.sendBack();
   // }
+
   const changeSelectedTool = (text) => {
     if (selectTool !== text) {
       setSelectedTool(text)
@@ -68,27 +52,27 @@ function App() {
 
       switch (selectTool) {
         case "CIRCLE":
-          editor?.setFillColor("rgb(255, 0, 0,1)")
-          editor?.addCircle({left: e.clientX - 80 , top: e.clientY - 160, width: 80, height:80, radius:80, angle:0});
+          editor?.addCircle({ left: e.clientX - 80, top: e.clientY - 160, width: 80, height: 80, radius: 80, angle: 0 });
           break;
         case "CIRCLE_WHITE":
           editor?.setFillColor("rgb(255,255,255,1)")
-          editor?.addCircle({left: e.clientX - 40 , top: e.clientY - 90, width: 80, height:80, radius:80, angle:0});
+          editor?.addCircle({ left: e.clientX - 40, top: e.clientY - 90, width: 80, height: 80, radius: 80, angle: 0 });
           break;
         case "RECT":
           editor?.setFillColor("rgb(255,0,0,1)")
-          editor?.addRectangle({left: e.clientX - 40 , top: e.clientY - 90, width: 80, height:80, angle:0});
+          editor?.addRectangle({ left: e.clientX - 40, top: e.clientY - 90, width: 80, height: 80, angle: 0 });
           break;
         case "TRIANGLE":
-          onAddTriangle();
+          editor?.addTriangle({ left: e.clientX - 40, top: e.clientY - 90, width: 80, height: 80, angle: 0 });
           break;
         case "TEXT":
-          onAddText();
+          editor?.addText({});
           break;
         case "ZOOM_IN":
           break;
         case "DELETE":
           editor?.deleteSelected();
+          break;
         default:
           break;
       }
@@ -106,12 +90,13 @@ function App() {
         <div className='w-75 d-flex justify-content-start  align-items-center '>
           <button className='bg-transparent text-white border-0 h5 me-3 my-1  ]' title="Crear nueva composicion">Nueva</button>
           <button className='bg-transparent text-white border-0 h5 me-3 my-1  ]' title="Abrir una composicion">Abrir</button>
+          <button className='bg-transparent text-white border-0 h5 me-3 my-1  ]' title="Abrir una composicion">Descargar</button>
           <PlayButton changeFunction={setPlay} condition={play} title="Pausar Composicion" altDescription="Reproducir Composicion" />
         </div>
-        <OpenButton Icon={AiFillProfile} condition={propertiesOpen} changeFunction={openProperties} title="Abrir menú de propiedades" altDescription="Cerrar menú de propiedades" />
+        <OpenButton Icon={AiFillProfile} condition={propertiesOpen} changeFunction={openProperties} altDescription="Abrir menú de propiedades" title="Cerrar menú de propiedades" />
       </Nav>
       <div onClick={doFunction}>
-        <FabricJSCanvas  className='canvas' onReady={onReady} />
+        <FabricJSCanvas className='canvas' onReady={onReady} />
       </div>
       {
         toolbarOpen ?
@@ -158,7 +143,22 @@ function App() {
       }
       {
         propertiesOpen ?
-          <Menu show={propertiesOpen} placement="end" toggleShow={openProperties} title="Propiedades" />
+          <Menu show={propertiesOpen} placement="end" toggleShow={openProperties} title="Propiedades" >
+            <div className='d-flex flex-column gap-3  justify-content-start align-items-baseline w-100  h-100'>
+              <div className='bg-white rounded text-dark h-25 w-100 p-2 d-flex flex-column'>
+                <h5>Colores</h5>
+                <div className='h-100 w-100 p-2 d-flex flex-row  gap-3 '>
+                  <ColorTable changeColor={changeColor}/>
+                </div>
+              </div>
+              <div className='bg-white rounded text-dark h-25 w-100 p-2 d-flex flex-column'>
+                <h5>Z-Index</h5>
+                <div className='h-100 w-100 p-2 d-flex flex-row  gap-3 '>
+                  <ZIndexInput/>
+                </div>
+              </div>
+            </div>
+          </Menu>
           :
           null
       }
