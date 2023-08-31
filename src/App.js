@@ -98,17 +98,13 @@ function App() {
     }
   };
   const openFileDialog = () => {
-    console.log("read -1")
     fileInputRef.current.click();
   };
   const handleFileChange = (event) => {
     const file = event.target.files[0];
-    console.log("read 0")
     if (file) {
       const reader = new FileReader();
-      console.log("read 1")
       reader.onload = async (e) => {
-        console.log("read 2")
         const content = e.target.result;
         const parsedData = await JSON.parse(content);
         setJsonData(parsedData)
@@ -207,7 +203,7 @@ function App() {
               <div className='bg-white rounded text-dark h-25 w-100 p-2 d-flex flex-column'>
                 <h5>Z-Index</h5>
                 <div className='h-100 w-100 p-2 d-flex flex-row  gap-3 '>
-                  <ZIndexInput bringBack={bringBack} bringForward={bringForward} />
+                  <ZIndexInput index={editor?.getIndex(selectedObjects[0])}  bringBack={bringBack} bringForward={bringForward} />
                 </div>
               </div>
             </div>
