@@ -16,6 +16,7 @@ import ColorTable from './components/ColorTable/ColorTable';
 import ZIndexInput from './components/ZIndexInput/ZIndexInput';
 import { saveAs } from 'file-saver';
 import { json } from 'react-router-dom';
+import AudioManager from './components/AudioManager/AudioManager';
 
 // import { useMobileOrientation } from 'react-device-detect';
 function App() {
@@ -24,7 +25,7 @@ function App() {
   const { editor, onReady, selectedObjects } = useFabricJSEditor()
   const [play, setPlay] = useState(false);
   const [name, setName] = useState("Nombre composicion");
-  // const [color, setColor] = useState("#ffffff");
+  const [playList, setPlayList] = useState([])
   const [toolbarOpen, setToolbarOpen] = useState(false);
   const [propertiesOpen, setPropertiesOpen] = useState(false);
   const openToolbar = () => { setToolbarOpen((toolbarOpen) => !toolbarOpen) }
@@ -34,6 +35,10 @@ function App() {
   const fileInputRef = useRef(null);
   // this effect adds a shorcut for delete key
   useDeleteSelectedOnKeyPress(editor)
+  const cleanCanvas = () => {
+    editor?.deleteAll();
+    setName("Nueva Composicion 1")
+  }
   const changeColor = (color) => {
     editor?.setFillColor(color)
   }
@@ -59,24 +64,23 @@ function App() {
       switch (selectTool) {
         case "CIRCLE":
           editor?.addCircle({ left: e.clientX - 80, top: e.clientY - 160, width: 80, height: 80, radius: 80, angle: 0 });
+          setPlayList((list) => [...list, editor?.fillColor]);
           break;
         case "CIRCLE_WHITE":
           editor?.addCircle({ left: e.clientX - 40, top: e.clientY - 90, width: 80, height: 80, radius: 80, angle: 0 }, { type: "CIRCLE_WHITE" });
+          setPlayList((list) => [...list, editor?.fillColor]);
           break;
         case "RECT":
-          editor?.setFillColor("rgb(255,0,0,1)")
           editor?.addRectangle({ left: e.clientX - 40, top: e.clientY - 90, width: 80, height: 80, angle: 0 });
+          setPlayList((list) => [...list, editor?.fillColor]);
           break;
         case "TRIANGLE":
           editor?.addTriangle({ left: e.clientX - 40, top: e.clientY - 90, width: 80, height: 80, angle: 0 });
+          setPlayList((list) => [...list, editor?.fillColor]);
           break;
         case "TEXT":
           editor?.addText({});
-          break;
-        case "ZOOM_IN":
-          break;
-        case "DELETE":
-          editor?.deleteSelected();
+          setPlayList((list) => [...list, editor?.fillColor]);
           break;
         default:
           break;
@@ -111,7 +115,6 @@ function App() {
       reader.readAsText(file);
     }
   };
-  // console.log(jsonData)
   useEffect(() => {
     editor?.loadJSON(jsonData)
   }, [jsonData])
@@ -126,7 +129,7 @@ function App() {
         <OpenButton Icon={AiOutlineTool} condition={toolbarOpen} changeFunction={openToolbar} altDescription="Abrir Barra de Herramientas" title="Cerrar Barra de Herramientas" />
         <div className='w-75 d-flex justify-content-start  align-items-center '>
           <input className=' file-button bg-transparent text-white border-0 h5 me-3 my-1' type="text" value={name} onChange={changeName}></input>
-          <button className='bg-transparent text-white border-0 h5 me-3 my-1' title="Crear nueva composicion">Nueva</button>
+          <button onClick={cleanCanvas} className='bg-transparent text-white border-0 h5 me-3 my-1' title="Crear nueva composicion">Nueva</button>
           <label htmlFor="fileInput">
             <button onClick={openFileDialog} className='bg-transparent text-white border-0 h5 me-3 my-1' title="Abrir una composicion">Abrir</button>
             <input
@@ -166,6 +169,7 @@ function App() {
                     <BsFillCircleFill size={40} />
                   </MenuButton>
                   <MenuButton onClick={() => {
+                    
                     editor.setFillColor("rgb(255,0,0,1)")
                     changeSelectedTool("TRIANGLE")
                   }} selected={selectTool === "TRIANGLE"}>
@@ -232,7 +236,7 @@ function App() {
           :
           null
       }
-
+      <AudioManager list={playList} play={play} length={playList.length} changeFunction={setPlay} />
     </div>
   );
 }
