@@ -7,12 +7,9 @@ const ColorTable = ({changeColor}) => {
       <ColorComponent changeColor={changeColor} color="#00f"/>
       <ColorComponent changeColor={changeColor} color="#0f0"/>
       <ColorComponent changeColor={changeColor} color="#f00"/>
-      <ColorComponent color="#f00"/>
-      <ColorComponent color="#f00"/>
-      <ColorComponent color="#f00"/>
-      <ColorComponent color="#f00"/>
-      <ColorComponent color="#f00"/>
-      <ColorComponent color="#f00"/>
+      <ColorComponent changeColor={changeColor} color="#ff0"/>
+      <ColorComponent changeColor={changeColor} color="#f0f"/>
+      <ColorComponent changeColor={changeColor} color="#0ff"/>
     </div>
   )
 }

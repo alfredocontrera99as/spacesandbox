@@ -53,7 +53,7 @@ function App() {
 
     }
   }
-  const doFunction = (e) => {
+  const doFunction = async (e) => {
     if (selectedObjects.length === 0) {
 
       switch (selectTool) {
@@ -61,8 +61,7 @@ function App() {
           editor?.addCircle({ left: e.clientX - 80, top: e.clientY - 160, width: 80, height: 80, radius: 80, angle: 0 });
           break;
         case "CIRCLE_WHITE":
-          editor?.setFillColor("rgb(255,255,255,1)")
-          editor?.addCircle({ left: e.clientX - 40, top: e.clientY - 90, width: 80, height: 80, radius: 80, angle: 0 });
+          editor?.addCircle({ left: e.clientX - 40, top: e.clientY - 90, width: 80, height: 80, radius: 80, angle: 0 }, { type: "CIRCLE_WHITE" });
           break;
         case "RECT":
           editor?.setFillColor("rgb(255,0,0,1)")
@@ -115,7 +114,7 @@ function App() {
   // console.log(jsonData)
   useEffect(() => {
     editor?.loadJSON(jsonData)
-  },[jsonData])
+  }, [jsonData])
   return (
     <div className="App" >
       <Nav
@@ -154,16 +153,28 @@ function App() {
               <div className='text-dark h-25 w-100 p-2 d-flex flex-column'>
                 <h5>Formas</h5>
                 <div className='h-100 w-100 p-2 d-flex flex-row  gap-3 '>
-                  <MenuButton onClick={() => changeSelectedTool("CIRCLE_WHITE")} selected={selectTool === "CIRCLE_WHITE"}>
+                  <MenuButton onClick={() => {
+                    editor.setFillColor("rgb(255,255,255,1)")
+                    changeSelectedTool("CIRCLE_WHITE")
+                  }} selected={selectTool === "CIRCLE_WHITE"}>
                     <BsCircle size={40} />
                   </MenuButton>
-                  <MenuButton onClick={() => changeSelectedTool("CIRCLE")} selected={selectTool === "CIRCLE"}>
+                  <MenuButton onClick={() => {
+                    editor.setFillColor("rgb(255,0,0,1)")
+                    changeSelectedTool("CIRCLE")
+                  }} selected={selectTool === "CIRCLE"}>
                     <BsFillCircleFill size={40} />
                   </MenuButton>
-                  <MenuButton onClick={() => changeSelectedTool("TRIANGLE")} selected={selectTool === "TRIANGLE"}>
+                  <MenuButton onClick={() => {
+                    editor.setFillColor("rgb(255,0,0,1)")
+                    changeSelectedTool("TRIANGLE")
+                  }} selected={selectTool === "TRIANGLE"}>
                     <BsTriangle size={40} />
                   </MenuButton>
-                  <MenuButton onClick={() => changeSelectedTool("RECT")} selected={selectTool === "RECT"}>
+                  <MenuButton onClick={() => {
+                    editor.setFillColor("rgb(255,0,0,1)")
+                    changeSelectedTool("RECT")
+                  }} selected={selectTool === "RECT"}>
                     <BsSquare size={40} />
                   </MenuButton>
                 </div>
@@ -194,18 +205,28 @@ function App() {
         propertiesOpen ?
           <Menu show={propertiesOpen} placement="end" toggleShow={openProperties} title="Propiedades" >
             <div className='d-flex flex-column gap-3  justify-content-start align-items-baseline w-100  h-100'>
-              <div className='bg-white rounded text-dark h-25 w-100 p-2 d-flex flex-column'>
-                <h5>Colores</h5>
-                <div className='h-100 w-100 p-2 d-flex flex-row  gap-3 '>
-                  <ColorTable changeColor={changeColor} />
+              {selectedObjects[0]?.optional.type !== "CIRCLE_WHITE" && selectedObjects[0]
+                ?
+                <div className='bg-white rounded text-dark h-25 w-100 p-2 d-flex flex-column'>
+                  <h5>Colores</h5>
+                  <div className='h-100 w-100 p-2 d-flex flex-row  gap-3 '>
+                    <ColorTable changeColor={changeColor} />
+                  </div>
                 </div>
-              </div>
-              <div className='bg-white rounded text-dark h-25 w-100 p-2 d-flex flex-column'>
-                <h5>Z-Index</h5>
-                <div className='h-100 w-100 p-2 d-flex flex-row  gap-3 '>
-                  <ZIndexInput index={editor?.getIndex(selectedObjects[0])}  bringBack={bringBack} bringForward={bringForward} />
+                :
+                null
+              }
+              {selectedObjects[0]
+                ?
+                <div className='bg-white rounded text-dark h-25 w-100 p-2 d-flex flex-column'>
+
+                  <h5>Z-Index</h5>
+                  <div className='h-100 w-100 p-2 d-flex flex-row  gap-3 '>
+                    <ZIndexInput index={editor?.getIndex(selectedObjects[0])} bringBack={bringBack} bringForward={bringForward} />
+                  </div>
                 </div>
-              </div>
+                : null
+              }
             </div>
           </Menu>
           :
