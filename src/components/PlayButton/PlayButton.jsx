@@ -1,7 +1,8 @@
 import { AiFillPlayCircle, AiOutlinePauseCircle } from "react-icons/ai";
-const PlayButton = ({ changeFunction, condition, title, altDescription }) => {
+const PlayButton = ({ changeFunction,setIndex, condition, title, altDescription }) => {
     const changeState = () => {
         changeFunction((val) => !val);
+        setIndex(0);
     }
     return (
         <div onClick={changeState} className="text-info   m-1" title={condition ? title : altDescription}>

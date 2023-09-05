@@ -14,7 +14,7 @@ const OpenButton = ({ changeFunction, condition = true, Icon, AltIcon = AiOutlin
     }
     return (
         <div onClick={changeState} className="text-white  p-2" title={condition ? title : altDescription }>
-            <div className='h-100 d-flex justify-content-center  align-items-center' style={{ maxWidth: "60px", height: "30px" }}>
+            <div className='h-100 d-flex justify-content-center  align-items-center' style={{ maxWidth: "60px", height: "30px", marginRight: "20px" }}>
                 {
 
                     condition === true ?

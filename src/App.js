@@ -24,6 +24,7 @@ function App() {
 
   const { editor, onReady, selectedObjects } = useFabricJSEditor()
   const [play, setPlay] = useState(false);
+  const [index, setIndex] = useState(0)
   const [name, setName] = useState("Nombre composicion");
   const [playList, setPlayList] = useState([])
   const [toolbarOpen, setToolbarOpen] = useState(false);
@@ -58,7 +59,7 @@ function App() {
 
     }
   }
-  const doFunction = async (e) => {
+  const doFunction = (e) => {
     if (selectedObjects.length === 0) {
 
       switch (selectTool) {
@@ -129,9 +130,9 @@ function App() {
         <OpenButton Icon={AiOutlineTool} condition={toolbarOpen} changeFunction={openToolbar} altDescription="Abrir Barra de Herramientas" title="Cerrar Barra de Herramientas" />
         <div className='w-75 d-flex justify-content-start  align-items-center '>
           <input className=' file-button bg-transparent text-white border-0 h5 me-3 my-1' type="text" value={name} onChange={changeName}></input>
-          <button onClick={cleanCanvas} className='bg-transparent text-white border-0 h5 me-3 my-1' title="Crear nueva composicion">Nueva</button>
+          <button onClick={cleanCanvas} className='bg-transparent text-white border-0 h5 me-3 my-1 p-1' title="Crear nueva composicion">Nueva</button>
           <label htmlFor="fileInput">
-            <button onClick={openFileDialog} className='bg-transparent text-white border-0 h5 me-3 my-1' title="Abrir una composicion">Abrir</button>
+            <button onClick={openFileDialog} className='bg-transparent text-white border-0 h5 me-3 my-1 p-1' title="Abrir una composicion">Abrir</button>
             <input
               type="file"
               id="fileInput"
@@ -141,8 +142,8 @@ function App() {
               style={{ display: 'none' }}
             />
           </label>
-          <button onClick={downloadJSON} className='bg-transparent text-white border-0 h5 me-3 my-1' title="Descargar composicion">Descargar</button>
-          <PlayButton changeFunction={setPlay} condition={play} title="Pausar Composicion" altDescription="Reproducir Composicion" />
+          <button onClick={downloadJSON} className='bg-transparent text-white border-0 h5 me-3 my-1 p-1' title="Descargar composicion">Descargar</button>
+          <PlayButton changeFunction={setPlay} setIndex={setIndex} condition={play} title="Pausar Composicion" altDescription="Reproducir Composicion" />
         </div>
         <OpenButton Icon={AiFillProfile} condition={propertiesOpen} changeFunction={openProperties} altDescription="Abrir menú de propiedades" title="Cerrar menú de propiedades" />
       </Nav>
@@ -154,7 +155,7 @@ function App() {
           <Menu show={toolbarOpen} toggleShow={openToolbar} title="Barra de Herramientas" >
             <div className='d-flex flex-column justify-content-start align-items-baseline w-100  h-100'>
               <div className='text-dark h-25 w-100 p-2 d-flex flex-column'>
-                <h5>Formas</h5>
+                <h5 className='p-1'>Formas</h5>
                 <div className='h-100 w-100 p-2 d-flex flex-row  gap-3 '>
                   <MenuButton onClick={() => {
                     editor.setFillColor("rgb(255,255,255,1)")
@@ -169,8 +170,10 @@ function App() {
                     <BsFillCircleFill size={40} />
                   </MenuButton>
                   <MenuButton onClick={() => {
-                    
-                    editor.setFillColor("rgb(255,0,0,1)")
+                    if(selectedObjects.length == 0 ){
+                      editor.setFillColor("rgb(255,0,0,1)")
+                    }else{
+                    }
                     changeSelectedTool("TRIANGLE")
                   }} selected={selectTool === "TRIANGLE"}>
                     <BsTriangle size={40} />
@@ -184,7 +187,7 @@ function App() {
                 </div>
               </div>
               <div className='text-dark h-25 w-100 p-2 d-flex flex-column'>
-                <h5>Otras</h5>
+                <h5 className='p-1'>Otras</h5>
                 <div className='h-100 w-100 p-2 d-flex flex-row  gap-3 '>
                   <MenuButton onClick={() => changeSelectedTool("TEXT")} selected={selectTool === "TEXT"}>
                     <TbAbc size={40} />
@@ -212,7 +215,7 @@ function App() {
               {selectedObjects[0]?.optional.type !== "CIRCLE_WHITE" && selectedObjects[0]
                 ?
                 <div className='bg-white rounded text-dark h-25 w-100 p-2 d-flex flex-column'>
-                  <h5>Colores</h5>
+                  <h5 className='p-1'>Colores</h5>
                   <div className='h-100 w-100 p-2 d-flex flex-row  gap-3 '>
                     <ColorTable changeColor={changeColor} />
                   </div>
@@ -236,7 +239,7 @@ function App() {
           :
           null
       }
-      <AudioManager list={playList} play={play} length={playList.length} changeFunction={setPlay} />
+      <AudioManager list={playList} index={index} setIndex={setIndex} play={play} length={playList.length} changeFunction={setPlay} />
     </div>
   );
 }
